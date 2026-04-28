@@ -35,21 +35,17 @@ impl<'a> Iterator for Lexer<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         use Token::*;
 
-        let mut scan = || {
-            let start = if let Some((index, _)) = self
-                .remainder
-                .chars()
-                .enumerate()
-                .find(|(_, c)| !c.is_whitespace())
-            {
-                index
-            } else {
-                self.remainder.len()
-            };
-            self.remainder = &self.remainder[start..];
+        // Scanning
+        let start = match self
+            .remainder
+            .chars()
+            .enumerate()
+            .find(|(_, c)| !c.is_whitespace())
+        {
+            Some((index, _)) => index,
+            _ => self.remainder.len(),
         };
-
-        scan();
+        self.remainder = &self.remainder[start..];
 
         let mut chars = self.remainder.chars();
         let token = match chars.next()? {
