@@ -42,11 +42,15 @@ impl<'a> Iterator for Lexer<'a> {
         // Lexing
         let token = match c {
             '0'..='9' => {
+                let mut peeker = self.iter.clone();
                 let start = i;
-                let end = match self.iter.find(|(_, c)| !c.is_digit(10)) {
+                let end = match peeker.find(|(_, c)| !c.is_digit(10)) {
                     Some((end, _)) => end,
                     None => self.input.len(),
                 };
+                if end - start > 1 {
+                    let _ = self.iter.nth(end - start - 1 - 1);
+                }
                 // TODO Handle overflow error
                 Integer(
                     self.input[start..end]
