@@ -37,10 +37,23 @@ impl<'a> Iterator for Lexer<'a> {
         use Token::*;
 
         // Scanning - skip whitespaces
-        let (_, c) = self.iter.find(|(_, c)| !c.is_whitespace())?;
+        let (i, c) = self.iter.find(|(_, c)| !c.is_whitespace())?;
 
         // Lexing
         let token = match c {
+            '0'..='9' => {
+                let start = i;
+                let end = match self.iter.find(|(_, c)| !c.is_digit(10)) {
+                    Some((end, _)) => end,
+                    None => self.input.len(),
+                };
+                // TODO Handle overflow error
+                Integer(
+                    self.input[start..end]
+                        .parse::<i64>()
+                        .expect("This subslice should be comprised of ASCII digits"),
+                )
+            }
             '+' => Plus,
             '-' => Minus,
             '*' => Star,
@@ -54,16 +67,25 @@ impl<'a> Iterator for Lexer<'a> {
 
 #[cfg(test)]
 mod tests {
+    use super::Token::*;
     use super::*;
+
+    #[test]
+    fn literals() {
+        let mut lexer = Lexer::new(" 12  3 4 ");
+        assert_eq!(lexer.next(), Some(Integer(12)));
+        assert_eq!(lexer.next(), Some(Integer(3)));
+        assert_eq!(lexer.next(), Some(Integer(4)));
+    }
 
     #[test]
     fn operators() {
         let mut lexer = Lexer::new("+  -   *  / ");
 
-        assert_eq!(lexer.next(), Some(Token::Plus));
-        assert_eq!(lexer.next(), Some(Token::Minus));
-        assert_eq!(lexer.next(), Some(Token::Star));
-        assert_eq!(lexer.next(), Some(Token::Slash));
+        assert_eq!(lexer.next(), Some(Plus));
+        assert_eq!(lexer.next(), Some(Minus));
+        assert_eq!(lexer.next(), Some(Star));
+        assert_eq!(lexer.next(), Some(Slash));
     }
 
     #[test]
