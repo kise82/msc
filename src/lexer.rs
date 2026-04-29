@@ -1,7 +1,12 @@
+use std::str::CharIndices;
+
 #[repr(C)]
 #[derive(Debug, PartialEq)]
 pub enum Token {
     Unknown,
+
+    // Literals
+    Integer(i64),
 
     // Operators
     Plus,
@@ -13,19 +18,15 @@ pub enum Token {
 #[repr(C)]
 pub struct Lexer<'a> {
     input: &'a str,
-    remainder: &'a str,
+    iter: CharIndices<'a>,
 }
 
 impl<'a> Lexer<'a> {
     pub fn new(input: &'a str) -> Self {
         Self {
             input,
-            remainder: input,
+            iter: input.char_indices(),
         }
-    }
-
-    fn advance(&mut self, chars: usize) {
-        self.remainder = &self.remainder[chars..];
     }
 }
 
@@ -35,28 +36,17 @@ impl<'a> Iterator for Lexer<'a> {
     fn next(&mut self) -> Option<Self::Item> {
         use Token::*;
 
-        // Scanning
-        let start = match self
-            .remainder
-            .chars()
-            .enumerate()
-            .find(|(_, c)| !c.is_whitespace())
-        {
-            Some((index, _)) => index,
-            _ => self.remainder.len(),
-        };
-        self.remainder = &self.remainder[start..];
+        // Scanning - skip whitespaces
+        let (_, c) = self.iter.find(|(_, c)| !c.is_whitespace())?;
 
-        let mut chars = self.remainder.chars();
-        let token = match chars.next()? {
+        // Lexing
+        let token = match c {
             '+' => Plus,
             '-' => Minus,
             '*' => Star,
             '/' => Slash,
             _ => Unknown,
         };
-
-        self.advance(1);
 
         Some(token)
     }
