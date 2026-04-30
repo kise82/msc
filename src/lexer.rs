@@ -28,12 +28,8 @@ impl<'a> Lexer<'a> {
             iter: input.char_indices(),
         }
     }
-}
 
-impl<'a> Iterator for Lexer<'a> {
-    type Item = Token;
-
-    fn next(&mut self) -> Option<Self::Item> {
+    pub fn lex(&mut self) -> Option<Token> {
         use Token::*;
 
         // Scanning - skip whitespaces
@@ -66,6 +62,14 @@ impl<'a> Iterator for Lexer<'a> {
         };
 
         Some(token)
+    }
+}
+
+impl<'a> Iterator for Lexer<'a> {
+    type Item = Token;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.lex()
     }
 }
 
