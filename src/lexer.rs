@@ -107,37 +107,38 @@ mod tests {
 
     #[test]
     fn mixed() {
-        let mut lexer = Lexer::new(
+        let tokens: Vec<Token> = Lexer::new(
             "
                 @val = 7 * 42;
             ",
-        );
+        )
+        .collect();
 
-        assert_eq!(lexer.next(), Some(Variable("val")));
-        assert_eq!(lexer.next(), Some(Equals));
-        assert_eq!(lexer.next(), Some(Integer(7)));
-        assert_eq!(lexer.next(), Some(Star));
-        assert_eq!(lexer.next(), Some(Integer(42)));
-        assert_eq!(lexer.next(), Some(Semicolon));
-        assert_eq!(lexer.next(), None);
+        assert_eq!(
+            tokens,
+            vec![
+                Variable("val"),
+                Equals,
+                Integer(7),
+                Star,
+                Integer(42),
+                Semicolon,
+            ],
+        );
     }
 
     #[test]
     fn literals() {
-        let mut lexer = Lexer::new(" 12  3 4 ");
-        assert_eq!(lexer.next(), Some(Integer(12)));
-        assert_eq!(lexer.next(), Some(Integer(3)));
-        assert_eq!(lexer.next(), Some(Integer(4)));
+        let tokens: Vec<Token> = Lexer::new(" 12  3 4 ").collect();
+
+        assert_eq!(tokens, vec![Integer(12), Integer(3), Integer(4)]);
     }
 
     #[test]
     fn operators() {
-        let mut lexer = Lexer::new("+  -   *  / ");
+        let tokens: Vec<Token> = Lexer::new("+  -   *  / ").collect();
 
-        assert_eq!(lexer.next(), Some(Plus));
-        assert_eq!(lexer.next(), Some(Minus));
-        assert_eq!(lexer.next(), Some(Star));
-        assert_eq!(lexer.next(), Some(Slash));
+        assert_eq!(tokens, vec![Plus, Minus, Star, Slash,],);
     }
 
     #[test]
