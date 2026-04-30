@@ -2,17 +2,23 @@ use std::{iter::Peekable, str::CharIndices};
 
 #[repr(C)]
 #[derive(Debug, PartialEq)]
-pub enum Token {
+pub enum Token<'a> {
     Unknown,
+
+    Variable(&'a str),
 
     // Literals
     Integer(i64),
 
     // Operators
+    Equals,
     Plus,
     Minus,
     Star,
     Slash,
+
+    // Punctuation
+    Semicolon,
 }
 
 #[repr(C)]
@@ -29,7 +35,7 @@ impl<'a> Lexer<'a> {
         }
     }
 
-    pub fn lex(&mut self) -> Option<Token> {
+    pub fn lex(&mut self) -> Option<Token<'a>> {
         use Token::*;
 
         // Scanning - skip whitespaces
@@ -37,6 +43,19 @@ impl<'a> Lexer<'a> {
 
         // Lexing
         let token = match c {
+            '@' => {
+                if let Some((start, c)) = self.iter.next()
+                    && c.is_alphanumeric()
+                {
+                    let end = match self.peek_while(|&(_, c)| c.is_alphanumeric()) {
+                        Some((end, _)) => end,
+                        None => self.input.len(),
+                    };
+                    Variable(&self.input[start..end])
+                } else {
+                    Unknown
+                }
+            }
             '0'..='9' => {
                 let start = i;
                 let end = match self.peek_while(|&(_, c)| c.is_digit(10)) {
@@ -50,10 +69,12 @@ impl<'a> Lexer<'a> {
                         .expect("This subslice should be comprised of ASCII digits"),
                 )
             }
+            '=' => Equals,
             '+' => Plus,
             '-' => Minus,
             '*' => Star,
             '/' => Slash,
+            ';' => Semicolon,
             _ => Unknown,
         };
 
@@ -72,7 +93,7 @@ impl<'a> Lexer<'a> {
 }
 
 impl<'a> Iterator for Lexer<'a> {
-    type Item = Token;
+    type Item = Token<'a>;
 
     fn next(&mut self) -> Option<Self::Item> {
         self.lex()
@@ -83,6 +104,23 @@ impl<'a> Iterator for Lexer<'a> {
 mod tests {
     use super::Token::*;
     use super::*;
+
+    #[test]
+    fn mixed() {
+        let mut lexer = Lexer::new(
+            "
+                @val = 7 * 42;
+            ",
+        );
+
+        assert_eq!(lexer.next(), Some(Variable("val")));
+        assert_eq!(lexer.next(), Some(Equals));
+        assert_eq!(lexer.next(), Some(Integer(7)));
+        assert_eq!(lexer.next(), Some(Star));
+        assert_eq!(lexer.next(), Some(Integer(42)));
+        assert_eq!(lexer.next(), Some(Semicolon));
+        assert_eq!(lexer.next(), None);
+    }
 
     #[test]
     fn literals() {
