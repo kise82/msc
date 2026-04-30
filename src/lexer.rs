@@ -1,4 +1,4 @@
-use std::str::CharIndices;
+use std::{iter::Peekable, str::CharIndices};
 
 #[repr(C)]
 #[derive(Debug, PartialEq)]
@@ -18,14 +18,14 @@ pub enum Token {
 #[repr(C)]
 pub struct Lexer<'a> {
     input: &'a str,
-    iter: CharIndices<'a>,
+    iter: Peekable<CharIndices<'a>>,
 }
 
 impl<'a> Lexer<'a> {
     pub fn new(input: &'a str) -> Self {
         Self {
             input,
-            iter: input.char_indices(),
+            iter: input.char_indices().peekable(),
         }
     }
 
@@ -38,15 +38,11 @@ impl<'a> Lexer<'a> {
         // Lexing
         let token = match c {
             '0'..='9' => {
-                let mut peeker = self.iter.clone();
                 let start = i;
-                let end = match peeker.find(|(_, c)| !c.is_digit(10)) {
+                let end = match self.peek_while(|&(_, c)| c.is_digit(10)) {
                     Some((end, _)) => end,
                     None => self.input.len(),
                 };
-                if end - start > 1 {
-                    let _ = self.iter.nth(end - start - 1 - 1);
-                }
                 // TODO Handle overflow error
                 Integer(
                     self.input[start..end]
@@ -62,6 +58,16 @@ impl<'a> Lexer<'a> {
         };
 
         Some(token)
+    }
+
+    fn peek_while<P>(&mut self, mut predicate: P) -> Option<(usize, char)>
+    where
+        P: FnMut(&(usize, char)) -> bool,
+    {
+        while predicate(self.iter.peek()?) {
+            self.iter.next();
+        }
+        self.iter.peek().copied()
     }
 }
 
