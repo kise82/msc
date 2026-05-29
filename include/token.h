@@ -13,6 +13,10 @@ typedef enum {
   MINUS,
   STAR,
   SLASH,
+  EQUALS,
+
+  // Markers
+  SEMICOLON,
 
   // End-of-stream
   EOS = 0xFF

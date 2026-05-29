@@ -27,7 +27,9 @@ Token lex(Lexer *lexer) {
     SC_TOK('+', PLUS)
     SC_TOK('-', MINUS)
     SC_TOK('*', STAR)
+    SC_TOK('=', EQUALS)
     SC_TOK('/', SLASH)
+    SC_TOK(';', SEMICOLON)
   }
 
   if (isdigit(CURRENT)) {
