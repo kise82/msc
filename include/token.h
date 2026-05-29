@@ -1,8 +1,14 @@
 #ifndef TOKEN_H
 #define TOKEN_H
+#include <stddef.h>
 
 typedef enum {
   UNKNOWN,
+
+  // Literals
+  INTEGER,
+  
+  // Operators
   PLUS,
   MINUS,
   STAR,
@@ -13,7 +19,16 @@ typedef enum {
 } TokenKind;
 
 typedef struct {
+  size_t offset;
+  size_t length;
+} Lexeme;
+
+typedef struct {
   TokenKind kind;
+  union {
+    char nothing_;
+    Lexeme lexeme;
+  } data;
 } Token;
 
 #endif

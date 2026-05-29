@@ -30,6 +30,18 @@ Token lex(Lexer *lexer) {
     SC_TOK('/', SLASH)
   }
 
+  if (isdigit(CURRENT)) {
+    ret.kind = INTEGER;
+    ret.data.lexeme.offset = lexer->pos;
+    do {
+      ++ret.data.lexeme.length;
+      ADVANCE;
+    } while (isdigit(CURRENT));
+
+    // TODO Employ an uniform advancing of the input
+    --lexer->pos;
+  }
+
   ADVANCE;
   
   return ret;
