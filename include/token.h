@@ -16,6 +16,8 @@ typedef enum {
   EQUALS,
 
   // Markers
+  LPAREN,
+  RPAREN,
   SEMICOLON,
 
   // End-of-stream

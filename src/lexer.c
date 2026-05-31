@@ -34,6 +34,9 @@ Token lex(Lexer *lexer) {
     SC_TOK('*', STAR)
     SC_TOK('=', EQUALS)
     SC_TOK('/', SLASH)
+
+    SC_TOK('(', LPAREN)
+    SC_TOK(')', RPAREN)
     SC_TOK(';', SEMICOLON)
   }
 
