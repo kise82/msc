@@ -41,11 +41,20 @@ static bool literals() {
   return REPORT(matches(script, kinds, ARR_SIZE(kinds)));
 }
 
+static bool mixed() {
+  const char *SCRIPT = "(8 + 42 )* 2";
+  const TokenKind KINDS[] = {
+    LPAREN, INTEGER, PLUS, INTEGER, RPAREN, STAR, INTEGER 
+  };
+  return REPORT(matches(SCRIPT, KINDS, ARR_SIZE(KINDS)));
+}
+
 // Runner
 
 int main() {
   bool emp = empty();
   bool ops = operators();
   bool lit = literals();
-  return (emp && ops && lit) ? 0 : 1;
+  bool mix = mixed();
+  return (emp && ops && lit && mix) ? 0 : 1;
 }
