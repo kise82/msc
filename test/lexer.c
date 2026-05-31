@@ -20,9 +20,11 @@ static bool matches(const char *input, const TokenKind expected[], const size_t 
 // Tests
 
 static bool operators() {
-  const char *script = "+  -  *   /-+* *";
-  const TokenKind kinds[] = {PLUS, MINUS, STAR, SLASH, MINUS, PLUS, STAR, STAR};
-  return REPORT(matches(script, kinds, ARR_SIZE(kinds)));
+  const char *SCRIPT = "    +  /   +  /=  -  *-= *  ";
+  const TokenKind KINDS[] = {
+    PLUS, SLASH, PLUS, SLASH, EQUALS, MINUS, STAR, MINUS, EQUALS, STAR
+  };
+  return REPORT(matches(SCRIPT, KINDS, ARR_SIZE(KINDS)));
 }
 
 static bool literals() {
