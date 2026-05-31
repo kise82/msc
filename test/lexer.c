@@ -4,7 +4,15 @@
 #include <stdbool.h>
 
 #define ARR_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
-#define REPORT(res) (printf("TEST\t%s ... %s\n", __FUNCTION__, (res) ? "ok" : "FAILED"), (res))
+#define TEST(fn) { \
+  printf("TEST\t%s ...", #fn); \
+  if ((fn)()) { \
+    printf("ok\n"); \
+  } else { \
+    printf("FAILED\n"); \
+    code = 1; \
+  } \
+}
 
 static bool matches(const char *input, const TokenKind expected[], const size_t n) {
   Lexer lexer = new_lexer(input);
@@ -22,9 +30,9 @@ static bool matches(const char *input, const TokenKind expected[], const size_t 
 static bool empty() {
   const char *SCRIPT = "\t  \v\n \t";
   const TokenKind KINDS[] = {};
-  bool ws = matches(SCRIPT, KINDS, 0);
-  bool null = matches(NULL, KINDS, 0);
-  return REPORT(ws && null);
+  bool ws = matches(SCRIPT, KINDS, ARR_SIZE(KINDS));
+  bool null = matches(NULL, KINDS, ARR_SIZE(KINDS));
+  return ws && null;
 }
 
 static bool operators() {
@@ -32,13 +40,13 @@ static bool operators() {
   const TokenKind KINDS[] = {
     PLUS, SLASH, PLUS, SLASH, EQUALS, MINUS, STAR, MINUS, EQUALS, STAR
   };
-  return REPORT(matches(SCRIPT, KINDS, ARR_SIZE(KINDS)));
+  return matches(SCRIPT, KINDS, ARR_SIZE(KINDS));
 }
 
 static bool literals() {
-  const char *script = "123 4  56";
-  const TokenKind kinds[] = {INTEGER, INTEGER, INTEGER};
-  return REPORT(matches(script, kinds, ARR_SIZE(kinds)));
+  const char *SCRIPT = "123 4  56";
+  const TokenKind KINDS[] = {INTEGER, INTEGER, INTEGER};
+  return matches(SCRIPT, KINDS, ARR_SIZE(KINDS));
 }
 
 static bool mixed() {
@@ -46,15 +54,16 @@ static bool mixed() {
   const TokenKind KINDS[] = {
     LPAREN, INTEGER, PLUS, INTEGER, RPAREN, STAR, INTEGER 
   };
-  return REPORT(matches(SCRIPT, KINDS, ARR_SIZE(KINDS)));
+  return matches(SCRIPT, KINDS, ARR_SIZE(KINDS));
 }
 
 // Runner
 
 int main() {
-  bool emp = empty();
-  bool ops = operators();
-  bool lit = literals();
-  bool mix = mixed();
-  return (emp && ops && lit && mix) ? 0 : 1;
+  int code = 0;
+  TEST(empty);
+  TEST(operators);
+  TEST(literals);
+  TEST(mixed);
+  return code;
 }
