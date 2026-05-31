@@ -19,10 +19,12 @@ static bool matches(const char *input, const TokenKind expected[], const size_t 
 
 // Tests
 
-static bool whitespaces() {
+static bool empty() {
   const char *SCRIPT = "\t  \v\n \t";
   const TokenKind KINDS[] = {};
-  return REPORT(matches(SCRIPT, KINDS, 0));
+  bool ws = matches(SCRIPT, KINDS, 0);
+  bool null = matches(NULL, KINDS, 0);
+  return REPORT(ws && null);
 }
 
 static bool operators() {
@@ -42,8 +44,8 @@ static bool literals() {
 // Runner
 
 int main() {
-  bool ws = whitespaces();
+  bool emp = empty();
   bool ops = operators();
   bool lit = literals();
-  return (ws && ops && lit) ? 0 : 1;
+  return (emp && ops && lit) ? 0 : 1;
 }

@@ -13,6 +13,11 @@ Token lex(Lexer *lexer) {
   #define ADVANCE ((void) (++lexer->pos))
 
   Token ret = { .kind = UNKNOWN };
+
+  if (lexer->input == NULL) {
+    ret.kind = EOS;
+    return ret;
+  }
   
   while (isspace(CURRENT))
     ADVANCE;
