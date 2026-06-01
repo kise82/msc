@@ -12,21 +12,24 @@ Lexer new_lexer(const char *input) {
 }
 
 Token lex(Lexer *lexer) {
-  #define CURRENT (lexer->input[lexer->pos])
-  #define ADVANCE ((void) (++lexer->pos))
+  #define ADVANCE() ((void) ++lexer->pos)
+  #define CONSUME() (lexer->input[lexer->pos++])
+  #define PEEK() (lexer->input[lexer->pos])
 
   Token ret = { .kind = UNKNOWN };
   
-  while (isspace(CURRENT))
-    ADVANCE;
+  char current;
+  do {
+    current = CONSUME();
+  } while (isspace(current));
 
-  if (CURRENT == '\0') {
+  if (current == '\0') {
     ret.kind = EOS;
     return ret;
   }
 
   #define SC_TOK(chr, tok) case (chr): { ret.kind = (tok); break; }
-  switch (CURRENT) {
+  switch (current) {
     SC_TOK('+', PLUS)
     SC_TOK('-', MINUS)
     SC_TOK('*', STAR)
@@ -36,21 +39,20 @@ Token lex(Lexer *lexer) {
     SC_TOK('(', LPAREN)
     SC_TOK(')', RPAREN)
     SC_TOK(';', SEMICOLON)
+
+    default: {
+      if (isdigit(current)) {
+        ret.kind = INTEGER;
+        ret.data.lexeme.offset = lexer->pos - 1;
+        ret.data.lexeme.length = 1;
+        while (isdigit(PEEK())) {
+          ++ret.data.lexeme.length;
+          ADVANCE();
+        }
+      }
+      break;
+    }
   }
-
-  if (isdigit(CURRENT)) {
-    ret.kind = INTEGER;
-    ret.data.lexeme.offset = lexer->pos;
-    do {
-      ++ret.data.lexeme.length;
-      ADVANCE;
-    } while (isdigit(CURRENT));
-
-    // TODO Employ an uniform advancing of the input
-    --lexer->pos;
-  }
-
-  ADVANCE;
   
   return ret;
 }
