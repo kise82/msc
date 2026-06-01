@@ -1,18 +1,8 @@
+#include "test.h"
 #include <lexer.h>
 
 #include <stdio.h>
 #include <stdbool.h>
-
-#define ARR_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
-#define TEST(fn) { \
-  printf("TEST\t%s ...", #fn); \
-  if ((fn)()) { \
-    printf("ok\n"); \
-  } else { \
-    printf("FAILED\n"); \
-    code = 1; \
-  } \
-}
 
 static bool matches(const char *input, const TokenKind expected[], const size_t n) {
   Lexer lexer = new_lexer(input);
@@ -59,11 +49,12 @@ static bool mixed() {
 
 // Runner
 
+SETUP_RUNNER();
+
 int main() {
-  int code = 0;
   TEST(empty);
   TEST(operators);
   TEST(literals);
   TEST(mixed);
-  return code;
+  return TESTS_RESULT;
 }
