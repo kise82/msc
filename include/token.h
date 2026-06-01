@@ -1,5 +1,6 @@
 #ifndef TOKEN_H
 #define TOKEN_H
+#include <stdint.h>
 #include <stddef.h>
 
 typedef enum {
@@ -25,15 +26,15 @@ typedef enum {
 } TokenKind;
 
 typedef struct {
-  size_t offset;
-  size_t length;
-} Lexeme;
+  uint16_t offset;
+  uint16_t length;
+} Span;
 
 typedef struct {
   TokenKind kind;
   union {
-    char nothing_;
-    Lexeme lexeme;
+    size_t __filler__;
+    Span lexeme;
   } data;
 } Token;
 
