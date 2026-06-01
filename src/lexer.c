@@ -4,7 +4,10 @@
 #include <ctype.h>
 
 Lexer new_lexer(const char *input) {
-  Lexer ret = { .input = input, .pos = 0 };
+  Lexer ret = {
+    .input = input != NULL ? input : "",
+    .pos = 0
+  };
   return ret;
 }
 
@@ -13,11 +16,6 @@ Token lex(Lexer *lexer) {
   #define ADVANCE ((void) (++lexer->pos))
 
   Token ret = { .kind = UNKNOWN };
-
-  if (lexer->input == NULL) {
-    ret.kind = EOS;
-    return ret;
-  }
   
   while (isspace(CURRENT))
     ADVANCE;
