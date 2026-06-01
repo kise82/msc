@@ -16,7 +16,7 @@ Token lex(Lexer *lexer) {
   #define CONSUME() (lexer->input[lexer->pos++])
   #define PEEK() (lexer->input[lexer->pos])
 
-  Token ret = { .kind = UNKNOWN };
+  Token ret = { .kind = UNKNOWN, .data.__filler__ = 0ULL };
   
   char current;
   do {
