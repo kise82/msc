@@ -26,15 +26,13 @@ typedef enum {
 } TokenKind;
 
 typedef struct {
-  uint16_t offset;
-  uint16_t length;
-} Span;
-
-typedef struct {
   TokenKind kind;
   union {
-    size_t __filler__;
-    Span lexeme;
+    struct {
+      size_t offset;
+      size_t length;
+    } lexeme;
+    int64_t i64;
   } data;
 } Token;
 

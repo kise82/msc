@@ -16,7 +16,7 @@ Token lex(Lexer *lexer) {
   #define CONSUME() (lexer->input[lexer->pos++])
   #define PEEK() (lexer->input[lexer->pos])
 
-  Token ret = { .kind = UNKNOWN, .data.__filler__ = 0ULL };
+  Token ret = { .kind = UNKNOWN };
   
   char current;
   do {
@@ -43,12 +43,13 @@ Token lex(Lexer *lexer) {
     default: {
       if (isdigit(current)) {
         ret.kind = INTEGER;
-        ret.data.lexeme.offset = lexer->pos - 1;
-        ret.data.lexeme.length = 1;
+        // TODO Handle overflowing literals
+        int64_t value = current - '0';
         while (isdigit(PEEK())) {
-          ++ret.data.lexeme.length;
+          value = 10 * value + (PEEK() - '0');
           ADVANCE();
         }
+        ret.data.i64 = value;
       }
       break;
     }
