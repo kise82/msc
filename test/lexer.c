@@ -12,7 +12,7 @@ static bool matches(const char *input, const TokenKind kinds[], const char *lexe
     if (kinds != NULL && (tok = lex(&lexer)).kind != kinds[i]) {
       return false;
     } else if (lexemes != NULL && lexemes[i] != NULL
-               && strncmp(&input[tok.data.lexeme.offset], lexemes[i], tok.data.lexeme.length) != 0) {
+               && strncmp(&input[tok.data.lexeme.offset], lexemes[i], strlen(lexemes[i])) != 0) {
       return false;
     }
   }
