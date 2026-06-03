@@ -49,14 +49,14 @@ static bool match_i64(const char *input, const int64_t expected[], const size_t 
 
 // Tests
 
-static bool empty() {
+static bool empty(void) {
   const char *SCRIPT = "\t  \v\n \t";
   bool ws = match_kinds(SCRIPT, NULL, 0);
   bool null = match_kinds(NULL, NULL, 0);
   return ws && null;
 }
 
-static bool operators() {
+static bool operators(void) {
   const char *SCRIPT = "    +  /   +  /=  -  *-= *  ";
   const TokenKind KINDS[] = {
     PLUS, SLASH, PLUS, SLASH, EQUALS, MINUS, STAR, MINUS, EQUALS, STAR
@@ -64,7 +64,7 @@ static bool operators() {
   return match_kinds(SCRIPT, KINDS, ARR_SIZE(KINDS));
 }
 
-static bool literals() {
+static bool literals(void) {
   const char *SCRIPT = "123 4  56";
   const TokenKind KINDS[] = {INTEGER, INTEGER, INTEGER};
   const int64_t VALUES[] = {123, 4, 56};
@@ -73,7 +73,7 @@ static bool literals() {
   return kinds && values;
 }
 
-static bool mixed() {
+static bool mixed(void) {
   const char *SCRIPT = "(8 + 42 )* 2";
   const TokenKind KINDS[] = {
     LPAREN, INTEGER, PLUS, INTEGER, RPAREN, STAR, INTEGER 
@@ -88,7 +88,7 @@ static bool mixed() {
 
 SETUP_RUNNER();
 
-int main() {
+int main(void) {
   TEST(empty);
   TEST(operators);
   TEST(literals);
