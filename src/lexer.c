@@ -6,7 +6,8 @@
 Lexer new_lexer(const char *input) {
   Lexer ret = {
     .input = input != NULL ? input : "",
-    .pos = 0
+    .pos = 0,
+    .peekable = { .kind = EOS }
   };
   return ret;
 }
@@ -23,18 +24,15 @@ Token lex(Lexer *lexer) {
     current = CONSUME();
   } while (isspace(current));
 
-  if (current == '\0') {
-    ret.kind = EOS;
-    return ret;
-  }
-
   #define SC_TOK(chr, tok) case (chr): { ret.kind = (tok); break; }
   switch (current) {
+    SC_TOK('\0', EOS)
+
     SC_TOK('+', PLUS)
     SC_TOK('-', MINUS)
     SC_TOK('*', STAR)
-    SC_TOK('=', EQUALS)
     SC_TOK('/', SLASH)
+    SC_TOK('=', EQUALS)
 
     SC_TOK('(', LPAREN)
     SC_TOK(')', RPAREN)
@@ -56,4 +54,11 @@ Token lex(Lexer *lexer) {
   }
   
   return ret;
+}
+
+const Token* peek(Lexer *lexer) {
+  size_t prev = lexer->pos;
+  lexer->peekable = lex(lexer);
+  lexer->pos = prev;
+  return &lexer->peekable;
 }
