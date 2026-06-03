@@ -5,26 +5,54 @@
 #include <stdbool.h>
 #include <string.h>
 
-static bool matches(const char *input, const TokenKind kinds[], const char *lexemes[], const size_t n) {
-  Lexer lexer = new_lexer(input);
-  Token tok;
-  for (size_t i = 0; i < n; ++i) {
-    if (kinds != NULL && (tok = lex(&lexer)).kind != kinds[i]) {
-      return false;
-    } else if (lexemes != NULL && lexemes[i] != NULL
-               && strncmp(&input[tok.data.lexeme.offset], lexemes[i], strlen(lexemes[i])) != 0) {
+#define MATCH_BODY(body) \
+Lexer lexer = new_lexer(input); \
+Token tok; \
+for (size_t i = 0; i < n; ++i) { \
+  tok = lex(&lexer); \
+  { \
+    body \
+  } \
+} \
+return lex(&lexer).kind == EOS;
+
+static bool match_kinds(const char *input, const TokenKind expected[], const size_t n) {
+  MATCH_BODY(
+    if (tok.kind != expected[i]) {
       return false;
     }
+  )
+}
+
+static bool match_lexemes(const char *input, const char *expected[], const size_t n) {
+  MATCH_BODY(
+    if (expected != NULL && expected[i] != NULL
+        && strncmp(&input[tok.data.lexeme.offset], expected[i], strlen(expected[i])) != 0) {
+      return false;
+    }
+  )
+}
+
+static bool match_i64(const char *input, const int64_t expected[], const size_t n) {
+  Lexer lexer = new_lexer(input);
+  Token tok;
+  for (size_t i = 0; (tok = lex(&lexer)).kind != EOS && i < n; ) {
+    if (tok.kind == INTEGER) {
+      if (tok.data.i64 != expected[i]) {
+        return false;
+      }
+      ++i;
+    }
   }
-  return lex(&lexer).kind == EOS;
+  return tok.kind == EOS;
 }
 
 // Tests
 
 static bool empty() {
   const char *SCRIPT = "\t  \v\n \t";
-  bool ws = matches(SCRIPT, NULL, NULL, 0);
-  bool null = matches(NULL, NULL, NULL, 0);
+  bool ws = match_kinds(SCRIPT, NULL, 0);
+  bool null = match_kinds(NULL, NULL, 0);
   return ws && null;
 }
 
@@ -33,14 +61,16 @@ static bool operators() {
   const TokenKind KINDS[] = {
     PLUS, SLASH, PLUS, SLASH, EQUALS, MINUS, STAR, MINUS, EQUALS, STAR
   };
-  return matches(SCRIPT, KINDS, NULL, ARR_SIZE(KINDS));
+  return match_kinds(SCRIPT, KINDS, ARR_SIZE(KINDS));
 }
 
 static bool literals() {
   const char *SCRIPT = "123 4  56";
   const TokenKind KINDS[] = {INTEGER, INTEGER, INTEGER};
-  const char *LEXEMES[] = {"123", "4", "56"};
-  return matches(SCRIPT, KINDS, LEXEMES, ARR_SIZE(KINDS));
+  const int64_t VALUES[] = {123, 4, 56};
+  bool kinds = match_kinds(SCRIPT, KINDS, ARR_SIZE(KINDS));
+  bool values = match_i64(SCRIPT, VALUES, ARR_SIZE(VALUES));
+  return kinds && values;
 }
 
 static bool mixed() {
@@ -48,10 +78,10 @@ static bool mixed() {
   const TokenKind KINDS[] = {
     LPAREN, INTEGER, PLUS, INTEGER, RPAREN, STAR, INTEGER 
   };
-  const char *LEXEMES[] = {
-    NULL, "8", NULL, "42", NULL, NULL, "2"
-  };
-  return matches(SCRIPT, KINDS, LEXEMES, ARR_SIZE(KINDS));
+  const int64_t VALUES[] = {8, 42, 2};
+  bool kinds = match_kinds(SCRIPT, KINDS, ARR_SIZE(KINDS));
+  bool values = match_i64(SCRIPT, VALUES, ARR_SIZE(VALUES));
+  return kinds && values;
 }
 
 // Runner
