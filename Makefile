@@ -1,5 +1,6 @@
 CC := clang
-CFLAGS := -pipe -fPIE -O2 -std=c11 -Iinclude/
+WARNS := -Wall -Wextra -Wpedantic -Wno-unused
+CFLAGS := -g -pipe -fPIE -O2 -std=c11 -Iinclude/ ${WARNS}
 
 SRC := $(wildcard src/*.c)
 OBJ := $(patsubst %.c,%.o,$(patsubst src/%,build/%,${SRC}))
