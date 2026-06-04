@@ -8,6 +8,7 @@
 typedef struct {
   const char *input;
   size_t pos;
+  bool peeked;
   Token peekable;
 } Lexer;
 

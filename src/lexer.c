@@ -7,6 +7,7 @@ Lexer new_lexer(const char *input) {
   Lexer ret = {
     .input = input != NULL ? input : "",
     .pos = 0,
+    .peeked = false,
     .peekable = { .kind = EOS }
   };
   return ret;
@@ -16,6 +17,11 @@ Token lex(Lexer *lexer) {
   #define ADVANCE() ((void) ++lexer->pos)
   #define CONSUME() (lexer->input[lexer->pos++])
   #define PEEK() (lexer->input[lexer->pos])
+  
+  if (lexer->peeked == true) {
+    lexer->peeked = false;
+    return lexer->peekable;
+  }
 
   Token ret = { .kind = UNKNOWN };
   
@@ -53,12 +59,15 @@ Token lex(Lexer *lexer) {
     }
   }
   
+  lexer->peeked = false;
+  
   return ret;
 }
 
 const Token* peek(Lexer *lexer) {
-  size_t prev = lexer->pos;
-  lexer->peekable = lex(lexer);
-  lexer->pos = prev;
+  if (lexer->peeked == false) {
+    lexer->peekable = lex(lexer);
+    lexer->peeked = true;
+  }
   return &lexer->peekable;
 }
