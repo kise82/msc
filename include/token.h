@@ -36,4 +36,6 @@ typedef struct {
   } data;
 } Token;
 
+const char *token_to_c_str(Token token);
+
 #endif
