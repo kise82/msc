@@ -2,7 +2,7 @@ CC := clang
 LINTS := -Wall -Wextra -Wpedantic -Wno-unused-parameter
 CFLAGS := -g -pipe -fPIE -O2 -std=c11 -Iinclude/ ${LINTS}
 
-SRC := $(wildcard src/*.c)
+SRC := $(shell find src/ -type f -name '*.c')
 OBJ := $(patsubst %.c,%.o,$(patsubst src/%,build/%,${SRC}))
 
 TEST := test/lexer-test
