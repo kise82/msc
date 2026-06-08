@@ -1,5 +1,5 @@
 CC := clang
-LINTS := -Wall -Wextra -Wpedantic -Wno-unused-parameter
+LINTS := -Wall -Wextra -Wpedantic -Wno-unused -Wno-unused-parameter
 CFLAGS := -g -pipe -fPIE -O2 -std=c11 -Iinclude/ ${LINTS}
 
 SRC := $(shell find src/ -type f -name '*.c')
