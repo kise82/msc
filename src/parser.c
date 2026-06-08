@@ -16,7 +16,7 @@ static inline Node *expression(Lexer *lexer) {
 static inline Node *term(Lexer *lexer) {
   Node *ret = factor(lexer);
   Token t = *peek(lexer);
-  while (t.kind == PLUS || t.kind == MINUS) {
+  while (t.kind == TOK_PLUS || t.kind == TOK_MINUS) {
     t = lex(lexer);
     ret = new_binary(t, ret, factor(lexer));
     t = *peek(lexer);
@@ -28,7 +28,7 @@ static inline Node *term(Lexer *lexer) {
 static inline Node *factor(Lexer *lexer) {
   Node *ret = atom(lexer);
   Token t = *peek(lexer);
-  while (t.kind == STAR || t.kind == SLASH) {
+  while (t.kind == TOK_STAR || t.kind == TOK_SLASH) {
     t = lex(lexer);
     ret = new_binary(t, ret, atom(lexer));
     t = *peek(lexer);
@@ -41,18 +41,18 @@ static inline Node *atom(Lexer *lexer) {
   Node *ret = NULL;
   Token t;
   switch ((t = lex(lexer)).kind) {
-    case PLUS:
-    case MINUS: {
+    case TOK_PLUS:
+    case TOK_MINUS: {
       ret = new_unary(t, atom(lexer));
       break;
     }
-    case INTEGER: {
+    case TOK_INTEGER: {
       ret = new_literal(t);
       break;
     }
-    case LPAREN: {
+    case TOK_LPAREN: {
       ret = expression(lexer);
-      if (lex(lexer).kind != RPAREN) {
+      if (lex(lexer).kind != TOK_RPAREN) {
         ret = NULL;
       }
       break;

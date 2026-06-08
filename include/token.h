@@ -4,25 +4,25 @@
 #include <stddef.h>
 
 typedef enum {
-  UNKNOWN,
+  TOK_UNKNOWN,
 
   // Literals
-  INTEGER,
+  TOK_INTEGER,
   
   // Operators
-  PLUS,
-  MINUS,
-  STAR,
-  SLASH,
-  EQUALS,
+  TOK_PLUS,
+  TOK_MINUS,
+  TOK_STAR,
+  TOK_SLASH,
+  TOK_EQUALS,
 
   // Markers
-  LPAREN,
-  RPAREN,
-  SEMICOLON,
+  TOK_LPAREN,
+  TOK_RPAREN,
+  TOK_SEMICOLON,
 
   // End-of-stream
-  EOS = 0xFF
+  TOK_EOF = 0xFF
 } TokenKind;
 
 typedef struct {

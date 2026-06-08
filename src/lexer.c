@@ -8,49 +8,49 @@ Lexer new_lexer(const char *input) {
     .input = input != NULL ? input : "",
     .pos = 0,
     .peeked = false,
-    .peekable = { .kind = EOS }
+    .peekable = { .kind = TOK_EOF }
   };
   return ret;
 }
 
 Token lex(Lexer *lexer) {
+  #define NEXT() (lexer->input[lexer->pos++])
   #define ADVANCE() ((void) ++lexer->pos)
-  #define CONSUME() (lexer->input[lexer->pos++])
-  #define PEEK() (lexer->input[lexer->pos])
+  #define PEEK(n) (lexer->input[lexer->pos + (n)])
   
   if (lexer->peeked == true) {
     lexer->peeked = false;
     return lexer->peekable;
   }
 
-  Token ret = { .kind = UNKNOWN };
+  Token ret = { .kind = TOK_UNKNOWN };
   
   char current;
   do {
-    current = CONSUME();
+    current = NEXT();
   } while (isspace(current));
 
   #define SC_TOK(chr, tok) case (chr): { ret.kind = (tok); break; }
   switch (current) {
-    SC_TOK('\0', EOS)
+    SC_TOK('\0', TOK_EOF)
 
-    SC_TOK('+', PLUS)
-    SC_TOK('-', MINUS)
-    SC_TOK('*', STAR)
-    SC_TOK('/', SLASH)
-    SC_TOK('=', EQUALS)
+    SC_TOK('+', TOK_PLUS)
+    SC_TOK('-', TOK_MINUS)
+    SC_TOK('*', TOK_STAR)
+    SC_TOK('/', TOK_SLASH)
+    SC_TOK('=', TOK_EQUALS)
 
-    SC_TOK('(', LPAREN)
-    SC_TOK(')', RPAREN)
-    SC_TOK(';', SEMICOLON)
+    SC_TOK('(', TOK_LPAREN)
+    SC_TOK(')', TOK_RPAREN)
+    SC_TOK(';', TOK_SEMICOLON)
 
     default: {
       if (isdigit(current)) {
-        ret.kind = INTEGER;
+        ret.kind = TOK_INTEGER;
         // TODO Handle overflowing literals
         int64_t value = current - '0';
-        while (isdigit(PEEK())) {
-          value = 10 * value + (PEEK() - '0');
+        while (isdigit(PEEK(0))) {
+          value = 10 * value + (PEEK(0) - '0');
           ADVANCE();
         }
         ret.data.i64 = value;

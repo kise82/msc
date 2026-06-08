@@ -14,7 +14,7 @@ for (size_t i = 0; i < n; ++i) { \
     body \
   } \
 } \
-return lex(&lexer).kind == EOS;
+return lex(&lexer).kind == TOK_EOF;
 
 static bool match_kinds(const char *input, const TokenKind expected[], const size_t n) {
   MATCH_BODY(
@@ -36,15 +36,15 @@ static bool match_lexemes(const char *input, const char *expected[], const size_
 static bool match_i64(const char *input, const int64_t expected[], const size_t n) {
   Lexer lexer = new_lexer(input);
   Token tok;
-  for (size_t i = 0; (tok = lex(&lexer)).kind != EOS && i < n; ) {
-    if (tok.kind == INTEGER) {
+  for (size_t i = 0; (tok = lex(&lexer)).kind != TOK_EOF && i < n; ) {
+    if (tok.kind == TOK_INTEGER) {
       if (tok.data.i64 != expected[i]) {
         return false;
       }
       ++i;
     }
   }
-  return tok.kind == EOS;
+  return tok.kind == TOK_EOF;
 }
 
 // Tests
@@ -59,14 +59,14 @@ static bool empty(void) {
 static bool operators(void) {
   const char *SCRIPT = "    +  /   +  /=  -  *-= *  ";
   const TokenKind KINDS[] = {
-    PLUS, SLASH, PLUS, SLASH, EQUALS, MINUS, STAR, MINUS, EQUALS, STAR
+    TOK_PLUS, TOK_SLASH, TOK_PLUS, TOK_SLASH, TOK_EQUALS, TOK_MINUS, TOK_STAR, TOK_MINUS, TOK_EQUALS, TOK_STAR
   };
   return match_kinds(SCRIPT, KINDS, ARR_SIZE(KINDS));
 }
 
 static bool literals(void) {
   const char *SCRIPT = "123 4  56";
-  const TokenKind KINDS[] = {INTEGER, INTEGER, INTEGER};
+  const TokenKind KINDS[] = {TOK_INTEGER, TOK_INTEGER, TOK_INTEGER};
   const int64_t VALUES[] = {123, 4, 56};
   bool kinds = match_kinds(SCRIPT, KINDS, ARR_SIZE(KINDS));
   bool values = match_i64(SCRIPT, VALUES, ARR_SIZE(VALUES));
@@ -76,7 +76,7 @@ static bool literals(void) {
 static bool mixed(void) {
   const char *SCRIPT = "(8 + 42 )* 2";
   const TokenKind KINDS[] = {
-    LPAREN, INTEGER, PLUS, INTEGER, RPAREN, STAR, INTEGER 
+    TOK_LPAREN, TOK_INTEGER, TOK_PLUS, TOK_INTEGER, TOK_RPAREN, TOK_STAR, TOK_INTEGER 
   };
   const int64_t VALUES[] = {8, 42, 2};
   bool kinds = match_kinds(SCRIPT, KINDS, ARR_SIZE(KINDS));
