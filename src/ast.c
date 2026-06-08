@@ -7,7 +7,7 @@
 
 Node *new_binary(Token op, Node *lhs, Node *rhs) {
   Node *node = ALLOC_NODE();
-  node->type = BINARY;
+  node->type = AST_BINARY;
   node->token = op;
   node->data.binary.lhs = lhs;
   node->data.binary.rhs = rhs;
@@ -16,7 +16,7 @@ Node *new_binary(Token op, Node *lhs, Node *rhs) {
 
 Node *new_unary(Token op, Node *operand) {
   Node *node = ALLOC_NODE();
-  node->type = UNARY;
+  node->type = AST_UNARY;
   node->token = op;
   node->data.unary.operand = operand;
   return node;
@@ -24,7 +24,7 @@ Node *new_unary(Token op, Node *operand) {
 
 Node *new_literal(Token literal) {
   Node *node = ALLOC_NODE();
-  node->type = VALUE;
+  node->type = AST_VALUE;
   node->token = literal;
   return node;
 }
@@ -35,7 +35,7 @@ void print_ast(const Node *root, String *buffer) {
     return;
   }
 
-  if (root->type == VALUE) {
+  if (root->type == AST_VALUE) {
     char scratch[32];
     sprintf(scratch, "%ld", root->token.data.i64);
     string_append(buffer, scratch);
@@ -46,13 +46,13 @@ void print_ast(const Node *root, String *buffer) {
   string_append(buffer, token_to_c_str(root->token));
   string_append(buffer, " ");
   switch (root->type) {
-    case BINARY: {
+    case AST_BINARY: {
       print_ast(root->data.binary.lhs, buffer);
       string_append(buffer, " ");
       print_ast(root->data.binary.rhs, buffer);
       break;
     }
-    case UNARY: {
+    case AST_UNARY: {
       print_ast(root->data.unary.operand, buffer);
       break;
     }
@@ -67,12 +67,12 @@ void print_ast(const Node *root, String *buffer) {
 void free_ast(Node *root) {
   if (root != NULL) {
     switch (root->type) {
-      case BINARY: {
+      case AST_BINARY: {
         free_ast(root->data.binary.lhs);
         free_ast(root->data.binary.rhs);
         break;
       }
-      case UNARY: {
+      case AST_UNARY: {
         free_ast(root->data.unary.operand);
         break;
       }

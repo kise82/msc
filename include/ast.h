@@ -6,9 +6,9 @@
 #include <stdint.h>
 
 typedef enum {
-  BINARY,
-  UNARY,
-  VALUE
+  AST_BINARY,
+  AST_UNARY,
+  AST_VALUE
 } NodeType;
 
 typedef struct Node Node;
