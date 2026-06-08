@@ -8,6 +8,7 @@ typedef enum {
 
   // Literals
   TOK_INTEGER,
+  TOK_FLOAT,
   
   // Operators
   TOK_PLUS,
@@ -33,6 +34,7 @@ typedef struct {
       size_t length;
     } lexeme;
     int64_t i64;
+    double f64;
   } data;
 } Token;
 

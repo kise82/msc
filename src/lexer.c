@@ -1,4 +1,5 @@
 #include <lexer.h>
+#include <stdio.h>
 #include <token.h>
 
 #include <ctype.h>
@@ -46,14 +47,24 @@ Token lex(Lexer *lexer) {
 
     default: {
       if (isdigit(current)) {
-        ret.kind = TOK_INTEGER;
-        // TODO Handle overflowing literals
-        int64_t value = current - '0';
+        size_t start = lexer->pos - 1;
+
         while (isdigit(PEEK(0))) {
-          value = 10 * value + (PEEK(0) - '0');
           ADVANCE();
         }
-        ret.data.i64 = value;
+
+        if (PEEK(0) == '.' && isdigit(PEEK(1))) {
+          ret.kind = TOK_FLOAT;
+          ADVANCE();
+          do {
+            current = NEXT();
+          } while (isdigit(current));
+
+          sscanf(&lexer->input[start], "%lf", &ret.data.f64);
+        } else {
+          ret.kind = TOK_INTEGER;
+          sscanf(&lexer->input[start], "%ld", &ret.data.i64);
+        }
       }
       break;
     }
