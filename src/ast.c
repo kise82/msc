@@ -37,7 +37,20 @@ void print_ast(const Node *root, String *buffer) {
 
   if (root->type == AST_VALUE) {
     char scratch[32];
-    sprintf(scratch, "%ld", root->token.data.i64);
+    switch (root->token.kind) {
+      case TOK_INTEGER: {
+        sprintf(scratch, "%ld", root->token.data.i64);
+        break;
+      }
+      case TOK_FLOAT: {
+        sprintf(scratch, "%lf", root->token.data.f64);
+        break;
+      }
+      default: {
+        scratch[0] = '\0';
+        break;
+      }
+    }
     string_append(buffer, scratch);
     return;
   }

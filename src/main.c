@@ -15,14 +15,20 @@ int main(int argc, char **argv) {
       break;
     }
     fflush(stdin);
+
+    String output = new_string(NULL);
     Node *ast_root = parse(BUFFER);
-    String s_expr = string_from_c_str(NULL);
-    print_ast(ast_root, &s_expr);
-    int64_t val = evaluate(ast_root);
-    printf("%ld\n", val);
-    printf("%s\n", s_expr.buffer);
-    free_string(&s_expr);
+    
+    Value val = evaluate(ast_root);
+    print_value(val, &output);
+    printf("%s\n", output.buffer);
+
+    string_truncate(&output);
+    print_ast(ast_root, &output);
+    printf("%s\n", output.buffer);
+    
     free_ast(ast_root);
+    free_string(&output);
   }
   return 0;
 }

@@ -36,7 +36,7 @@ static inline Node *factor(Lexer *lexer) {
   return ret;
 }
 
-// atom -> ('+' | '-') atom | INTEGER | '(' expression ')'
+// atom -> ('+' | '-') atom | INTEGER | FLOAT | '(' expression ')'
 static inline Node *atom(Lexer *lexer) {
   Node *ret = NULL;
   Token t;
@@ -46,7 +46,8 @@ static inline Node *atom(Lexer *lexer) {
       ret = new_unary(t, atom(lexer));
       break;
     }
-    case TOK_INTEGER: {
+    case TOK_INTEGER:
+    case TOK_FLOAT: {
       ret = new_literal(t);
       break;
     }

@@ -2,9 +2,9 @@
 
 #include <stdlib.h>
 
-String string_from_c_str(const char *c_str) {
-  const size_t INITIAL_CAPACITY = 16;
-  
+#define INITIAL_CAPACITY 16
+
+String new_string(const char *c_str) {
   String ret = {
     .buffer = NULL,
     .length = 0,
@@ -23,7 +23,7 @@ String string_from_c_str(const char *c_str) {
 void string_append(String *string, const char *c_str) {
   if (string != NULL && c_str != NULL) {
     if (string->capacity == 0) {
-      string->capacity = 16;
+      string->capacity = INITIAL_CAPACITY;
       string->buffer = realloc(string->buffer, string->capacity);
     }
     
@@ -43,6 +43,15 @@ void string_append(String *string, const char *c_str) {
       string->buffer = realloc(string->buffer, string->capacity);
     }
     string->buffer[string->length] = '\0';
+  }
+}
+
+void string_truncate(String *string) {
+  if (string != NULL) {
+    string->length = 0;
+    if (string->buffer != NULL) {
+      string->buffer[string->length] = '\0';
+    }
   }
 }
 

@@ -9,8 +9,9 @@ typedef struct {
   size_t capacity;
 } String;
 
-String string_from_c_str(const char *c_str);
+String new_string(const char *c_str);
 void string_append(String *string, const char *c_str);
+void string_truncate(String *string);
 void free_string(String *string);
 
 #endif
