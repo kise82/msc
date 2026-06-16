@@ -2,6 +2,7 @@
 #include <interpreter.h>
 #include <ast.h>
 #include <adt/string.h>
+#include <prettyprint.h>
 
 #include <stdio.h>
 

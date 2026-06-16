@@ -4,6 +4,7 @@
 #include <adt/string.h>
 
 #include <stdint.h>
+
 typedef enum {
   VOID,
   INTEGER,
@@ -26,7 +27,5 @@ Value add_values(Value lhs, Value rhs);
 Value sub_values(Value lhs, Value rhs);
 Value mul_values(Value lhs, Value rhs);
 Value div_values(Value lhs, Value rhs);
-
-void print_value(Value value, String *buffer);
 
 #endif

@@ -30,7 +30,6 @@ Node *new_binary(Token op, Node *lhs, Node *rhs);
 Node *new_unary(Token op, Node *operand);
 Node *new_literal(Token literal);
 
-void print_ast(const Node *root, String *buffer);
 void free_ast(Node *root);
 
 #endif

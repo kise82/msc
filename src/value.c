@@ -59,24 +59,3 @@ Value mul_values(Value lhs, Value rhs) {
 Value div_values(Value lhs, Value rhs) {
   OP_BODY(/)
 }
-
-void print_value(Value value, String *buffer) {
-  if (buffer != NULL) {
-    char scratch[32];
-    switch (value.type) {
-      case INTEGER: {
-        sprintf(scratch, "%ld", value.value.i64);
-        break;
-      }
-      case FLOAT: {
-        sprintf(scratch, "%lf", value.value.f64);
-        break;
-      }
-      case VOID: {
-        strncpy(scratch, "(void)", 6);
-        break;
-      }
-    }
-    string_append(buffer, scratch);
-  }
-}
