@@ -59,3 +59,19 @@ Value mul_values(Value lhs, Value rhs) {
 Value div_values(Value lhs, Value rhs) {
   OP_BODY(/)
 }
+
+Value cmp_values(Token op, Value lhs, Value rhs) {
+  assert(lhs.type == rhs.type);
+  Value ret = { .type = BOOL };
+  #define CASE(typ, fld) case (typ): { ret.value.bool_ = lhs.value.fld == rhs.value.fld; break; }
+  switch (lhs.type) {
+    CASE(BOOL, bool_)
+    CASE(INTEGER, i64)
+    CASE(FLOAT, f64)
+    default: {
+      assert(0 && "Invalid type passed to comparison");
+      break;
+    }
+  }
+  return ret;
+}

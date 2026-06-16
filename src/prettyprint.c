@@ -1,6 +1,7 @@
 #include <prettyprint.h>
 
 #include <stdio.h>
+#include <string.h>
 
 void print_token(const Token token, String *buffer) {
   const char *lexeme = NULL;
@@ -11,6 +12,13 @@ void print_token(const Token token, String *buffer) {
     CASE(TOK_STAR, "*")
     CASE(TOK_SLASH, "/")
     CASE(TOK_EQUALS, "=")
+    CASE(TOK_EQUALS_EQUALS, "==")
+    CASE(TOK_BANG, "!")
+    CASE(TOK_BANG_EQUALS, "!=")
+    CASE(TOK_LESS, "<")
+    CASE(TOK_LESS_EQUALS, "<=")
+    CASE(TOK_GREATER, ">")
+    CASE(TOK_GREATER_EQUALS, ">=")
     CASE(TOK_LPAREN, "(")
     CASE(TOK_RPAREN, ")")
     CASE(TOK_SEMICOLON, ";")
@@ -59,6 +67,14 @@ void print_ast(const Node *root, String *buffer) {
 void print_value(const Value value, String *buffer) {
   char scratch[32] = { '\0' };
   switch (value.type) {
+    case BOOL: {
+      if (value.value.bool_ == true) {
+        strncpy(scratch, "true", 4);
+      } else {
+        strncpy(scratch, "false", 5);
+      }
+      break;
+    }
     case INTEGER: {
       sprintf(scratch, "%ld", value.value.i64);
       break;

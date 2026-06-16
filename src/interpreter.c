@@ -32,6 +32,15 @@ Value evaluate(const Node *root) {
         case TOK_MINUS: return sub_values(lhs, rhs);
         case TOK_STAR: return mul_values(lhs, rhs);
         case TOK_SLASH: return div_values(lhs, rhs);
+
+        case TOK_EQUALS_EQUALS:
+        case TOK_BANG_EQUALS: {
+          Value ret = cmp_values(root->token, lhs, rhs);
+          if (root->token.kind == TOK_BANG_EQUALS) {
+            ret.value.bool_ = !ret.value.bool_;
+          }
+          return ret;
+        }
         default: {
           assert(0 && "Invalid operator passed as binary node");
           break;

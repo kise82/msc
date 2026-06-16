@@ -3,17 +3,36 @@
 
 #include <stdio.h>
 
+static inline Node *program(Lexer *lexer);
+static inline Node *expression(Lexer *lexer);
+static inline Node *relational(Lexer *lexer);
 static inline Node *term(Lexer *);
 static inline Node *factor(Lexer *);
 static inline Node *atom(Lexer *);
 
-// expression -> term
-static inline Node *expression(Lexer *lexer) {
-  return term(lexer);
+// program -> expression
+Node *program(Lexer *lexer) {
+  return expression(lexer);
+}
+
+// expression -> relational
+Node *expression(Lexer *lexer) {
+  return relational(lexer);
+}
+
+// relational -> term (('==' | '!=') term)
+Node *relational(Lexer *lexer) {
+  Node *ret = term(lexer);
+  Token t = *peek(lexer);
+  if (t.kind == TOK_EQUALS_EQUALS || t.kind == TOK_BANG_EQUALS) {
+    t = lex(lexer);
+    ret = new_binary(t, ret, term(lexer));
+  }
+  return ret;
 }
 
 // term -> factor (('+' | '-') factor)*
-static inline Node *term(Lexer *lexer) {
+Node *term(Lexer *lexer) {
   Node *ret = factor(lexer);
   Token t = *peek(lexer);
   while (t.kind == TOK_PLUS || t.kind == TOK_MINUS) {
@@ -25,7 +44,7 @@ static inline Node *term(Lexer *lexer) {
 }
 
 // factor -> atom (('*' | '/') atom)*
-static inline Node *factor(Lexer *lexer) {
+Node *factor(Lexer *lexer) {
   Node *ret = atom(lexer);
   Token t = *peek(lexer);
   while (t.kind == TOK_STAR || t.kind == TOK_SLASH) {
@@ -37,7 +56,7 @@ static inline Node *factor(Lexer *lexer) {
 }
 
 // atom -> ('+' | '-') atom | INTEGER | FLOAT | '(' expression ')'
-static inline Node *atom(Lexer *lexer) {
+Node *atom(Lexer *lexer) {
   Node *ret = NULL;
   Token t;
   switch ((t = lex(lexer)).kind) {
