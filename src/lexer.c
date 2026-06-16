@@ -32,6 +32,15 @@ Token lex(Lexer *lexer) {
   } while (isspace(current));
 
   #define SC_TOK(chr, tok) case (chr): { ret.kind = (tok); break; }
+  #define DC_TOK(chr1, tok1, chr2, tok2) \
+case (chr1): { \
+  ret.kind = (tok1); \
+  if (PEEK(0) == (chr2)) { \
+    ret.kind = (tok2); \
+    ADVANCE(); \
+  } \
+  break; \
+}
   switch (current) {
     SC_TOK('\0', TOK_EOF)
 
@@ -39,7 +48,10 @@ Token lex(Lexer *lexer) {
     SC_TOK('-', TOK_MINUS)
     SC_TOK('*', TOK_STAR)
     SC_TOK('/', TOK_SLASH)
-    SC_TOK('=', TOK_EQUALS)
+    DC_TOK('=', TOK_EQUALS, '=', TOK_EQUALS_EQUALS)
+    DC_TOK('!', TOK_BANG, '=', TOK_BANG_EQUALS)
+    DC_TOK('<', TOK_LESS, '=', TOK_LESS_EQUALS)
+    DC_TOK('>', TOK_GREATER, '=', TOK_GREATER_EQUALS)
 
     SC_TOK('(', TOK_LPAREN)
     SC_TOK(')', TOK_RPAREN)
