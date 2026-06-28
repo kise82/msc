@@ -1,4 +1,5 @@
 #include <adt/hashtable.h>
+#include <utils.h>
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -75,14 +76,7 @@ void **table_insert_or_get(HashTable *table, const char *key) {
     HTEntry *entry = table_find(table->entries, table->capacity, key);
 
     if (entry->key == NULL) {
-      size_t len = strlen(key);
-      char *buffer;
-      if ((buffer = malloc(len + 1)) == NULL) {
-        return NULL;
-      }
-      buffer[len] = '\0';
-      strcpy(buffer, key);
-      entry->key = buffer;
+      entry->key = utils_strdup(key);
 
       ++table->length;
     }
