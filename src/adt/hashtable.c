@@ -91,6 +91,19 @@ void **table_insert_or_get(HashTable *table, const char *key) {
   return NULL;
 }
 
+void *table_delete(HashTable *table, const char *key) {
+  void *ret = NULL;
+  if (table != NULL && key != NULL) {
+    HTEntry *entry = table_find(table->entries, table->capacity, key);
+    if (entry->key != NULL) {
+      free(entry->key);
+      ret = entry->value;
+      entry->key = entry->value = NULL;
+    }
+  }
+  return ret;
+}
+
 void free_table(HashTable *table) {
   if (table != NULL) {
     if (table->entries != NULL) {

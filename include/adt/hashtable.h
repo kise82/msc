@@ -15,6 +15,7 @@ typedef struct {
 
 HashTable new_table(void);
 void **table_insert_or_get(HashTable *table, const char *key);
+void *table_delete(HashTable *table, const char *key);
 void free_table(HashTable *table);
 
 #endif
