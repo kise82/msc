@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define INITIAL_CAPACITY 4
+#define INITIAL_CAPACITY 16
 
 static inline uint64_t hash(const char *key) {
   const uint64_t FNV_OFFSET = 14695981039346656037UL;
