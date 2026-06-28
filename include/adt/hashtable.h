@@ -13,7 +13,7 @@ typedef struct {
   size_t capacity;
 } HashTable;
 
-HashTable *new_table(void);
+HashTable new_table(void);
 void **table_insert_or_get(HashTable *table, const char *key);
 void free_table(HashTable *table);
 

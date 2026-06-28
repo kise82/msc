@@ -5,7 +5,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#define INITIAL_CAPACITY 16
+#define INITIAL_CAPACITY 4
 
 static inline uint64_t hash(const char *key) {
   const uint64_t FNV_OFFSET = 14695981039346656037UL;
@@ -21,64 +21,71 @@ static inline uint64_t hash(const char *key) {
   return ret;
 }
 
-static inline bool table_grow(HashTable *table) {
-  HTEntry *entries = calloc(table->capacity * 2, sizeof(HTEntry));
-  if (entries != NULL) {
+static HTEntry *table_find(HTEntry *entries, size_t capacity, const char *key) {
+  if (entries != NULL && key != NULL) {
+    size_t index = hash(key) & (capacity - 1);
+    HTEntry *entry;
+    while ((entry = &entries[index])->key != NULL) {
+      if (strcmp(key, entry->key) == 0) {
+        break;
+      }
+      index = (index + 1) & (capacity - 1);
+    }
+    return entry;
+  }
+  return NULL;
+}
+
+static bool table_grow(HashTable *table) {
+  HTEntry *new_entries = calloc(table->capacity * 2, sizeof(HTEntry));
+  if (new_entries != NULL) {
     for (size_t i = 0; i < table->capacity; ++i) {
-      HTEntry *entry = &table->entries[i];
-      if (entry->key != NULL) {
-        size_t index = hash(entry->key) & (table->capacity * 2 - 1);
-        while (entries[index].key != NULL) {
-          index = (index + 1) & (table->capacity * 2 - 1);
-        }
-        entries[index].key = entry->key;
-        entries[index].value = entry->value;
+      HTEntry *old_entry = &table->entries[i];
+      if (old_entry->key != NULL) {
+        HTEntry *new_entry = table_find(new_entries, table->capacity * 2, old_entry->key);
+        new_entry->key = old_entry->key;
+        new_entry->value = old_entry->value;
       }
     }
     free(table->entries);
-    table->entries = entries;
+    table->entries = new_entries;
     table->capacity *= 2;
     return true;
   }
   return false;
 }
 
-HashTable *new_table(void) {
-  HashTable *ret = malloc(sizeof(HashTable));
-  if (ret != NULL) {
-    ret->capacity = INITIAL_CAPACITY;
-    if ((ret->entries = calloc(ret->capacity, sizeof(HTEntry))) == NULL) {
-      free(ret);
-      return NULL;
-    }
-    ret->length = 0;
+HashTable new_table(void) {
+  HashTable ret = {
+    .length = 0,
+    .capacity = INITIAL_CAPACITY
+  };
+  if ((ret.entries = calloc(ret.capacity, sizeof(HTEntry))) == NULL) {
+    ret.capacity = 0;
   }
   return ret;
 }
 
 void **table_insert_or_get(HashTable *table, const char *key) {
-  if (table != NULL) {
+  if (table != NULL && table->entries != NULL) {
     if (table->length >= (table->capacity / 2) && table_grow(table) == false) {
       return NULL;
     }
     
-    size_t index = hash(key) & (table->capacity - 1);
-    HTEntry *entry = &table->entries[index];
-    while (entry->key != NULL) {
-      if (strcmp(entry->key, key) == 0) {
-        return &entry->value;
-      }
+    HTEntry *entry = table_find(table->entries, table->capacity, key);
 
-      index = (index + 1) % (table->capacity - 1);
-    }
-
-    {
+    if (entry->key == NULL) {
       size_t len = strlen(key);
-      char *buffer = malloc((len + 1) * sizeof(char));
+      char *buffer;
+      if ((buffer = malloc(len + 1)) == NULL) {
+        return NULL;
+      }
       buffer[len] = '\0';
       strcpy(buffer, key);
+      entry->key = buffer;
+
+      ++table->length;
     }
-    ++table->length;
     return &entry->value;
   }
   return NULL;
