@@ -6,6 +6,13 @@
 typedef enum {
   TOK_UNKNOWN,
 
+  // Identifiers
+  TOK_IDENT,
+  
+  // Keywords
+  TOK_TRUE,
+  TOK_FALSE,
+  
   // Literals
   TOK_INTEGER,
   TOK_FLOAT,
@@ -37,7 +44,7 @@ typedef struct {
   TokenKind kind;
   union {
     struct {
-      size_t offset;
+      char *ptr;
       size_t length;
     } lexeme;
     int64_t i64;

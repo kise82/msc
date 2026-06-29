@@ -55,7 +55,7 @@ Node *factor(Lexer *lexer) {
   return ret;
 }
 
-// atom -> ('+' | '-') atom | INTEGER | FLOAT | '(' expression ')'
+// atom -> ('+' | '-') atom | TRUE | FALSE | INTEGER | FLOAT | '(' expression ')'
 Node *atom(Lexer *lexer) {
   Node *ret = NULL;
   Token t;
@@ -65,6 +65,8 @@ Node *atom(Lexer *lexer) {
       ret = new_unary(t, atom(lexer));
       break;
     }
+    case TOK_TRUE:
+    case TOK_FALSE:
     case TOK_INTEGER:
     case TOK_FLOAT: {
       ret = new_literal(t);

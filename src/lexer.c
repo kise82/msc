@@ -1,16 +1,30 @@
 #include <lexer.h>
-#include <stdio.h>
 #include <token.h>
 
+#include <stdio.h>
+#include <string.h>
 #include <ctype.h>
 
 Lexer new_lexer(const char *input) {
+  Keyword KEYWORDS[] = {
+    {"true", TOK_TRUE},
+    {"false", TOK_FALSE}
+  };
+
   Lexer ret = {
     .input = input != NULL ? input : "",
     .pos = 0,
+    
     .peeked = false,
-    .peekable = { .kind = TOK_EOF }
+    .peekable = { .kind = TOK_EOF },
+
+    .env = new_env(),
+
+    .lexeme_buf = { '\0' }
   };
+  
+  env_register_kws(&ret.env, KEYWORDS, sizeof(KEYWORDS) / sizeof(KEYWORDS[0]));
+  
   return ret;
 }
 
@@ -58,7 +72,18 @@ case (chr1): { \
     SC_TOK(';', TOK_SEMICOLON)
 
     default: {
-      if (isdigit(current)) {
+      if (isalpha(current) || current == '_') {
+        size_t i = lexer->pos - 1;
+        do {
+          current = NEXT();
+        } while (isalnum(current) || current == '_');
+        size_t len = (lexer->pos - 1) - i;
+        
+        strncpy(lexer->lexeme_buf, lexer->input + i, len);
+        lexer->lexeme_buf[len] = '\0';
+        
+        ret = env_fetch(&lexer->env, lexer->lexeme_buf);
+      } else if (isdigit(current)) {
         size_t start = lexer->pos - 1;
 
         while (isdigit(PEEK(0))) {

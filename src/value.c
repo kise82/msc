@@ -1,5 +1,3 @@
-#include <stdio.h>
-#include <string.h>
 #include <value.h>
 
 #include <assert.h>
@@ -10,6 +8,12 @@ const Value ZERO_F64 = { .type = FLOAT, .value.f64 = 0.0F };
 Value new_value(Token literal) {
   Value ret;
   switch (literal.kind) {
+    case TOK_TRUE:
+    case TOK_FALSE: {
+      ret.type = BOOL;
+      ret.value.bool_ = literal.kind == TOK_TRUE;
+      break;
+    }
     case TOK_INTEGER: {
       ret.type = INTEGER;
       ret.value.i64 = literal.data.i64;
