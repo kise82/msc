@@ -93,6 +93,7 @@ void *table_delete(HashTable *table, const char *key) {
       free(entry->key);
       ret = entry->value;
       entry->key = entry->value = NULL;
+      --table->length;
     }
   }
   return ret;
