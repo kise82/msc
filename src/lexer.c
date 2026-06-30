@@ -74,10 +74,12 @@ case (chr1): { \
     default: {
       if (isalpha(current) || current == '_') {
         size_t i = lexer->pos - 1;
-        do {
-          current = NEXT();
-        } while (isalnum(current) || current == '_');
-        size_t len = (lexer->pos - 1) - i;
+        char c = PEEK(0);
+        while (isalnum(c) || c == '_') {
+          ADVANCE();
+          c = PEEK(0);
+        }
+        size_t len = lexer->pos - i;
         
         strncpy(lexer->lexeme_buf, lexer->input + i, len);
         lexer->lexeme_buf[len] = '\0';
